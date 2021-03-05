@@ -15,11 +15,12 @@ void* read_input (void* arg) {
     int client_socket = *arg_intp;
     while (1) {
         char* line_buf = NULL; 
-        size_t line_buf_size = 0; 
+        size_t line_buf_size = 0;
         int line_size = getline(&line_buf, &line_buf_size, stdin); 
         if (line_size == -1) {
             break;
         }
+        line_buf[line_size-1] = '\0';
         send(client_socket, line_buf, line_size, 0); 
     }
     return NULL;
