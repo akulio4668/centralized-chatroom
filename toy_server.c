@@ -51,8 +51,12 @@ int main(int argc, char **argv) {
         socklen_t client_len = sizeof(client_address);
         client_socket = accept(server_socket, (struct sockaddr*)&client_address, &client_len);
         
+        if (client_socket != -1) {
+            printf("connected to socket!\n");
+        }
+
         size_t num_bytes_read;
-        while ((num_bytes_read = read(client_socket, buffer, BUFFER_SIZE)) != -1) {
+        while ((num_bytes_read = read(client_socket, buffer, BUFFER_SIZE)) > 0) {
             printf("received some bytes...\n");
         }
         close(client_socket);
