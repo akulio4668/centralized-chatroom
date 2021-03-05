@@ -7,6 +7,24 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
+#include <pthread.h> 
+
+//thread: read user input from stdin and broadcast to server 
+void* read_input (void* arg) {	
+    int* arg_intp = (int*)(arg); 
+    int client_socket = *arg_intp;
+    while (1) {
+        char* line_buf = NULL; 
+        size_t line_buf_size = 0; 
+        int line_size = getline(&line_buf, &line_buf_size, stdin); 
+        if (line_size == -1) {
+            break;
+        }
+        send(client_socket, line_buf, line_size, 0); 
+    }
+    return NULL;
+}
+
 
 int main(int argc, char **argv) {
     struct protoent *protoent;
@@ -36,6 +54,9 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     } else {
         printf("connected to server!\n");
+        pthread_t user_thread; 
+        pthread_create(&user_thread, NULL, read_input, (void*)(&client_socket));
+        pthread_join(user_thread, NULL); 
     }
 
     close(client_socket);
