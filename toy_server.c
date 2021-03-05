@@ -11,7 +11,7 @@
 
 int main(int argc, char **argv) {
     // Some influence taken from https://stackoverflow.com/questions/307692/how-to-open-and-use-a-socket-in-c
-    char *buffer[BUFFER_SIZE];
+    char buffer[BUFFER_SIZE];
     struct protoent *protoent;
     char *protoname = "tcp";
     int server_socket, client_socket;
@@ -56,8 +56,8 @@ int main(int argc, char **argv) {
         }
 
         size_t num_bytes_read;
-        while ((num_bytes_read = read(client_socket, buffer, BUFFER_SIZE)) > 0) {
-            printf("received some bytes...\n");
+        while ((num_bytes_read = recv(client_socket, buffer, BUFFER_SIZE, 0)) > 0) {
+            printf("%s\n", buffer);
         }
         close(client_socket);
     }
