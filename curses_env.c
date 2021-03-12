@@ -5,10 +5,10 @@
 
 int main(int argc, char **argv) {
     long iter;
-    int yi, xi;
-    int y[3], x[3];
-    int index;
     int maxlines, maxcols;
+
+    char buff[1000];
+    int pos = 0;
 
     initscr();
     cbreak();
@@ -19,36 +19,27 @@ int main(int argc, char **argv) {
     maxlines = LINES - 1;
     maxcols = COLS - 1;
 
-    y[0] = 0;
-    x[0] = 0;
+    while (1) {
+        for (iter = 0; iter <= maxcols; iter++) {
+            mvaddch(maxlines - 1, iter, '=');
+        }
 
-    y[1] = maxlines;
-    x[1] = maxcols / 2;
+        move(maxlines, maxcols);
 
-    y[2] = 0;
-    x[2] = maxcols;
+        char c = getch();
+        if (c == 127) {
+            if (pos > 0)
+                buff[--pos] = 0;
+        } else {
+            buff[pos++] = c;
+        }
 
-    mvaddch(y[0], x[0], '0');
-    mvaddch(y[1], x[1], '1');
-    mvaddch(y[2], x[2], '2');
+        clear();
 
-    yi = random() % (maxlines + 1);
-    xi = random() % (maxcols + 1);
+        mvaddstr(maxlines, maxcols - pos + 1, buff);
 
-    mvaddch(yi, xi, '.');
-
-    for (iter = 0; iter < ITERMAX; iter++) {
-        index = random() % 3;
-
-        yi = (yi + y[index]) / 2;
-        xi = (xi + x[index]) / 2;
-
-        mvaddch(yi, xi, '*');
-        refresh();
+        
     }
-
-
-    mvaddstr(maxlines, 0, "Press any key to quit");
 
     refresh();
 
