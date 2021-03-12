@@ -1,5 +1,6 @@
 #include <curses.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define ITERMAX 10000
 
@@ -8,7 +9,10 @@ int main(int argc, char **argv) {
     int maxlines, maxcols;
 
     char buff[1000];
-    int pos = 0;
+    int buffpos = 0;
+
+    char *chathist[1000];
+    int histpos = 0;
 
     initscr();
     cbreak();
@@ -28,17 +32,32 @@ int main(int argc, char **argv) {
 
         char c = getch();
         if (c == 127) {
-            if (pos > 0)
-                buff[--pos] = 0;
+            if (buffpos > 0)
+                buff[--buffpos] = 0;
+        } else if (c == '\n') {
+            if (buff[0] != 0) {
+                buff[buffpos] = 0;
+                chathist[histpos++] = strdup(buff);
+                for (int i = 0; i < 1000; ++i) {
+                    buff[i] = 0;
+                }
+                buffpos = 0;
+            }
         } else {
-            buff[pos++] = c;
+            buff[buffpos++] = c;
         }
 
         clear();
 
-        mvaddstr(maxlines, maxcols - pos + 1, buff);
+        for (int i = histpos - 1; i >= 0; i--) {
+            mvaddstr(maxlines - 1 - histpos + i, maxcols - strlen(chathist[i]) + 1, chathist[i]);
+        }
 
-        
+        if ((maxcols - buffpos + 1) >= 0) {
+            mvaddstr(maxlines, maxcols - buffpos + 1, buff);
+        } else {
+            mvaddstr(maxlines, 0, buff - (maxcols - buffpos + 1));
+        }
     }
 
     refresh();
