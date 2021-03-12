@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
     struct sockaddr_in server_address;
     unsigned port = 12345u;
 
-    protoent = getprotobyname(protoname);
+    protoent = getprotobyname(protoname); //could be getADDRINFO 
     if (!protoent) {
         perror("protoent not found!");
         exit(EXIT_FAILURE);

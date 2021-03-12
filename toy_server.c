@@ -9,6 +9,10 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 
+
+
+
+
 int main(int argc, char **argv) {
     // Some influence taken from https://stackoverflow.com/questions/307692/how-to-open-and-use-a-socket-in-c
     char buffer[BUFFER_SIZE];
@@ -56,7 +60,7 @@ int main(int argc, char **argv) {
         }
 
         size_t num_bytes_read;
-        while ((num_bytes_read = recv(client_socket, buffer, BUFFER_SIZE, 0)) > 0) {
+        while ((num_bytes_read = recv(client_socket, buffer, BUFFER_SIZE, 0)) > 0) { //TODO wrap recv call 
             printf("%s\n", buffer);
         }
         close(client_socket);
