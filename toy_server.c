@@ -9,10 +9,6 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 
-
-
-
-
 int main(int argc, char **argv) {
     // Some influence taken from https://stackoverflow.com/questions/307692/how-to-open-and-use-a-socket-in-c
     char buffer[BUFFER_SIZE];
