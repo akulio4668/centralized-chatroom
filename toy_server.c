@@ -3,15 +3,34 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <pthread.h> 
+#include <string.h>
 
 #include <netdb.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 
+int MAX_CLIENTS = 10; 
+int num_clients = 0; 
+
+//typedef struct client_info {
+//    int clients[MAX_CLIENTS]; 
+//    int client_num;
+//} client_info_t; 
+
+void* handle_client(void* arg) {
+    int client_socket = *(int*)(arg); 
+    char buffer[BUFFER_SIZE];
+    size_t num_bytes_read;
+    while ((num_bytes_read = recv(client_socket, buffer, BUFFER_SIZE, 0)) > 0) { //TODO wrap recv call 
+        printf("%s\n", buffer);
+    }
+    close(client_socket);
+}
+
 int main(int argc, char **argv) {
     // Some influence taken from https://stackoverflow.com/questions/307692/how-to-open-and-use-a-socket-in-c
-    char buffer[BUFFER_SIZE];
     struct protoent *protoent;
     char *protoname = "tcp";
     int server_socket, client_socket;
@@ -46,20 +65,29 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
     printf("listening on port %d\n", port);
-
+    
+    pthread_t tid[MAX_CLIENTS]; 
+    memset(&tid, 0, sizeof(tid)); 
     while (1) {
         socklen_t client_len = sizeof(client_address);
-        client_socket = accept(server_socket, (struct sockaddr*)&client_address, &client_len);
-        
-        if (client_socket != -1) {
+        client_socket = accept(server_socket, (struct sockaddr*)&client_address, &client_len);   
+        if (client_socket < 0) {
+            perror("accept()"); 
+            exit(1); 
+        } else {
             printf("connected to socket!\n");
         }
-
-        size_t num_bytes_read;
-        while ((num_bytes_read = recv(client_socket, buffer, BUFFER_SIZE, 0)) > 0) { //TODO wrap recv call 
-            printf("%s\n", buffer);
+        
+        int idx = 0;
+        for (size_t i = 0; i < MAX_CLIENTS; i++) {
+            if (tid[i] == 0) {
+                idx = i;
+                //client[i] = client_socket;
+                break;
+            }
         }
-        close(client_socket);
+        num_clients++; 
+        pthread_create(&tid[idx], NULL, handle_client, (void*)(&client_socket)); 
     }
 
     close(server_socket);
